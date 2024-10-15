@@ -1,0 +1,64 @@
+extends layout
+
+block content
+  h1= title
+  #map(style="height: 500px;")
+
+  form(action="/submit" method="post" enctype="multipart/form-data")
+    div
+      label(for="name") Name:
+      input(type="text" name="name" required)
+    div
+      label(for="latitude") Latitude:
+      input(type="text" name="latitude" required)
+    div
+      label(for="longitude") Longitude:
+      input(type="text" name="longitude" required)
+    div
+      button(type="submit") Submit
+
+  script(src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js")
+  link(rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css")
+  
+  script.
+    var map = L.map('map').setView([51.505, -0.09], 2);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    function getUserData() {
+      fetch('./getUserData')
+        .then(response => response.json())
+        .then(data => {
+          data = JSON.parse(data)
+          data.forEach((marker) => {
+            L.marker([marker.latitude, marker.longitude], title=marker.name).addTo(map) 
+          })
+        
+        })
+        .catch(error => console.error('Error fetching user data:', error));
+    }
+
+    window.onload = function() {
+      getUserData();
+    };
+
+
+//-     function getUserData() {
+//-   fetch('./getUserData')
+//-     .then(response => response.json())
+//-     .then(data => {
+//-       data.forEach((marker) => {
+//-         console.log(marker); // Log each marker object
+
+//-         // Add marker to the map using the latitude, longitude, and name
+//-         L.marker([marker.latitude, marker.longitude], { title: marker.name }).addTo(map);
+//-       });
+//-     })
+//-     .catch(error => console.error('Error fetching user data:', error));
+//- }
+
+    window.onload = function() {
+      getUserData();
+    };
